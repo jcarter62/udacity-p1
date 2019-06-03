@@ -1,11 +1,11 @@
-#!/usr/bin/env python3  
+#!/usr/bin/env python
 import psycopg2
 
 
 class DB:
 
     def __init__(self):
-        self.connection_string = "dbname=news user=postgres password=postgres"
+	self.connection_string = "dbname=news"
         self.conn = None
 
     def connect(self):
