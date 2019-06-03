@@ -1,8 +1,18 @@
 #!/usr/bin/env python
 import psycopg2
 
+'''
+Udacity Full Stack Web Developer Nanodegree
+Project: Logs Analysis
+Author: Jim Carter
+Date: 6/3/2019
+'''
 
 class DB:
+    # 
+    # Helper Class to provide connection to database
+    # and methods to get and print required queries.
+    #
 
     def __init__(self):
 	self.connection_string = "dbname=news"
@@ -20,6 +30,9 @@ class DB:
             self.conn.close()
 
     def get_popular_articles(self):
+        #
+        # Objective #1, obtain top three popular articles.
+        #
         result = []
         try:
             self.connect()
@@ -49,6 +62,10 @@ class DB:
         return
 
     def get_popular_authors(self):
+        #
+        # Objective #2, obtain popular authors along with number
+        # of page views.
+        #
         result = []
         try:
             self.connect()
@@ -76,10 +93,17 @@ class DB:
             print(rec[0] + " -- " + str(rec[1]) + " views")
         return
 
-    def get_log_errors(self, min_percent):
-        if min_percent is None:
-            min_percent = 1.0
+    def get_log_errors(self, min_percent = 1.0):
+        #
+        # Objective #3, obtain list of days where the error rate 
+        # is > 1%
+        # 
+        # Providing a min_percent of about 0.50 produces output
+        # that is a bit more interesting.
+        # 
+
         result = []
+
         try:
             self.connect()
             cursor = self.conn.cursor()
@@ -119,9 +143,10 @@ class DB:
         return
 
 
+# Main Code
 db = DB()
 db.print_popular_articles(db.get_popular_articles())
 print('')
 db.print_popular_authors(db.get_popular_authors())
 print('')
-db.print_log_errors(db.get_log_errors(1.0))
+db.print_log_errors(db.get_log_errors())
