@@ -8,14 +8,15 @@ Author: Jim Carter
 Date: 6/3/2019
 '''
 
+
 class DB:
-    # 
+    #
     # Helper Class to provide connection to database
     # and methods to get and print required queries.
     #
 
     def __init__(self):
-	self.connection_string = "dbname=news"
+        self.connection_string = "dbname=news"
         self.conn = None
 
     def connect(self):
@@ -57,8 +58,8 @@ class DB:
 
     def print_popular_articles(self, data):
         print("What are the most popular three articles of all time?")
-        for rec in data:
-            print(rec[0] + " -- " + str(rec[1]) + " views")
+        for article, views in data:
+            print("{} -- {} views".format(article, views))
         return
 
     def get_popular_authors(self):
@@ -89,18 +90,15 @@ class DB:
 
     def print_popular_authors(self, data):
         print("What are the most popular authors of all time?")
-        for rec in data:
-            print(rec[0] + " -- " + str(rec[1]) + " views")
+        for author, views in data:
+            print("{} -- {} views".format(author, views))
         return
 
-    def get_log_errors(self, min_percent = 1.0):
+    def get_log_errors(self):
         #
-        # Objective #3, obtain list of days where the error rate 
+        # Objective #3, obtain list of days where the error rate
         # is > 1%
-        # 
-        # Providing a min_percent of about 0.50 produces output
-        # that is a bit more interesting.
-        # 
+        #
 
         result = []
 
@@ -108,7 +106,7 @@ class DB:
             self.connect()
             cursor = self.conn.cursor()
 
-            cmd = """select *, %s as minpct from (
+            cmd = """select * from (
                        select cast(log.time as char(10)) as day,
                          round(
                            (sum(CASE
@@ -119,11 +117,11 @@ class DB:
                        from log
                        group by day
                      ) as t
-                     where t.PctError > %s
+                     where t.PctError > 1.0
                      order by day;
                   """
 
-            cursor.execute(cmd, [min_percent, min_percent])
+            cursor.execute(cmd)
             results = cursor.fetchall()
             self.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -133,13 +131,9 @@ class DB:
     def print_log_errors(self, data):
         title = "On which days did more than 1% of requests lead to errors?"
 
-        if data.__len__() > 0:
-            title = "On which days did more than " + str(data[0][2]) + \
-                    "% of requests lead to errors?"
-
         print(title)
-        for rec in data:
-            print(rec[0] + " -- " + str(rec[1]) + "% errors")
+        for day, error_pct in data:
+            print("{} -- {}% errors".format(day, error_pct))
         return
 
 
@@ -150,3 +144,4 @@ print('')
 db.print_popular_authors(db.get_popular_authors())
 print('')
 db.print_log_errors(db.get_log_errors())
+print('')
